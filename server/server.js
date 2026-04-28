@@ -11,38 +11,11 @@ const PORT = 5000;
 
 // Home route
 app.get("/", (req, res) => {
-  res.send("Server is running 🚀");
+  res.send("Server running 🚀");
 });
 
-// API Route
-app.post("/leads", async (req, res) => {
-  try {
-    const { location, profession } = req.body;
-
-    const query = `${profession} in ${location}`;
-
-    const url = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${query}&key=${process.env.API_KEY}`;
-
-    const response = await axios.get(url);
-
-    const results = response.data.results;
-
-    const leads = results.map((place) => ({
-      name: place.name,
-      address: place.formatted_address,
-      rating: place.rating || "N/A",
-      website: "",
-    }));
-
-    res.json(leads);
-  } catch (error) {
-    console.log(error.message);
-    res.status(500).json({ error: "Something went wrong" });
-  }
-});
-
+// MAIN API
 app.get("/clients/:keyword", async (req, res) => {
-  const api_key = process.env.OPENWEBNINJA_API_KEY;
   try {
     const keyword = req.params.keyword;
 
@@ -50,26 +23,58 @@ app.get("/clients/:keyword", async (req, res) => {
       "https://api.openwebninja.com/local-business-data/search",
       {
         headers: {
-          "X-API-Key": api_key,
+          "X-API-Key": process.env.OPENWEBNINJA_API_KEY,
           Accept: "*/*",
         },
         params: {
           query: keyword,
-          limit: 20,
+          limit: 90,
         },
       },
     );
 
-    res.json(response.data);
+    const data = response.data?.data || [];
+
+    console.log("Sample Data:", data[0]);
+
+    const leads = data.map((item) => {
+      const phone =
+        item.phone ||
+        item.phone_number ||
+        item.contact?.phone ||
+        item.contact?.phone_number ||
+        (Array.isArray(item.phones) ? item.phones[0] : null) ||
+        "N/A";
+
+      const reviewCount =
+        item.review_count || item.reviews || item.user_ratings_total || "N/A";
+
+      return {
+        name: item.name || "N/A",
+        address: item.address || "N/A",
+        phone: phone,
+        rating: item.rating || "N/A",
+        website: item.website || "",
+        reviews: reviewCount,
+      };
+    });
+    const filteredLeads = leads.filter(
+      (item) => !item.website || item.website === "N/A",
+    );
+
+    res.json(filteredLeads);
+
+    res.json(leads);
   } catch (error) {
-    console.error("Error:", error.response?.data || error.message);
+    console.error("ERROR:", error.response?.data || error.message);
+
     res.status(500).json({
-      error: "Failed to fetch data",
+      error: "Failed to fetch leads",
     });
   }
 });
 
-// Server start (ONLY ONCE)
+//  Start server
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(` Server running on port ${PORT}`);
 });
