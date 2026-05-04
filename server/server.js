@@ -18,6 +18,8 @@ app.get("/", (req, res) => {
 app.get("/clients/:keyword", async (req, res) => {
   try {
     const keyword = req.params.keyword;
+    const requestedLimit = Number(req.query.limit);
+    const limit = Number.isInteger(requestedLimit) && requestedLimit > 0 && requestedLimit <= 100 ? requestedLimit : 50;
 
     const response = await axios.get(
       "https://api.openwebninja.com/local-business-data/search",
@@ -28,7 +30,7 @@ app.get("/clients/:keyword", async (req, res) => {
         },
         params: {
           query: keyword,
-          limit: 90,
+          limit,
         },
       },
     );
@@ -49,6 +51,14 @@ app.get("/clients/:keyword", async (req, res) => {
       const reviewCount =
         item.review_count || item.reviews || item.user_ratings_total || "N/A";
 
+      const mapUrl =
+        item.place_link ||
+        (item.place_id
+          ? `https://www.google.com/maps/place/?q=place_id:${item.place_id}`
+          : item.latitude && item.longitude
+          ? `https://www.google.com/maps/search/?api=1&query=${item.latitude},${item.longitude}`
+          : "");
+
       return {
         name: item.name || "N/A",
         address: item.address || "N/A",
@@ -56,6 +66,7 @@ app.get("/clients/:keyword", async (req, res) => {
         rating: item.rating || "N/A",
         website: item.website || "",
         reviews: reviewCount,
+        mapUrl,
       };
     });
     const filteredLeads = leads.filter(
@@ -63,8 +74,6 @@ app.get("/clients/:keyword", async (req, res) => {
     );
 
     res.json(filteredLeads);
-
-    res.json(leads);
   } catch (error) {
     console.error("ERROR:", error.response?.data || error.message);
 

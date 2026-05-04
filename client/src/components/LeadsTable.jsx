@@ -1,112 +1,205 @@
-export default function LeadsTable({ leads, location, profession }) {
+import { Download, ExternalLink, Map, Globe, CheckCircle2, Calendar, MessageSquare, Star } from "lucide-react";
+import * as XLSX from "xlsx";
+
+export default function LeadsTable({ leads, location, profession, limit }) {
   const getValidUrl = (url) => {
     if (!url) return "";
     if (url.startsWith("http")) return url;
     return `https://${url}`;
   };
 
+  const exportToExcel = () => {
+    const exportData = leads.map((lead) => ({
+      name: lead.name || "",
+      phone: lead.phone || "",
+      email: "",
+      link: lead.mapUrl || "",
+      rating: lead.rating || "",
+      reviews: lead.reviews || "",
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(exportData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Leads");
+
+    worksheet["!cols"] = [
+      { wch: 35 },
+      { wch: 18 },
+      { wch: 20 },
+      { wch: 50 },
+      { wch: 10 },
+      { wch: 10 },
+    ];
+
+    const filename = `${profession}_in_${location}_${new Date().toISOString().split("T")[0]}.xlsx`;
+    XLSX.writeFile(workbook, filename);
+  };
+
+  const exportToCsv = () => {
+    const exportData = leads.map((lead) => ({
+      name: lead.name || "",
+      phone: lead.phone || "",
+      email: "",
+      link: lead.mapUrl || "",
+      rating: lead.rating || "",
+      reviews: lead.reviews || "",
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(exportData);
+    const csv = XLSX.utils.sheet_to_csv(worksheet);
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${profession}_in_${location}_${new Date().toISOString().split("T")[0]}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
-    <div className="max-w-7xl mx-auto mt-6 bg-white border rounded-2xl shadow overflow-hidden">
+    <div className="mt-12 bg-white border border-slate-200 shadow-2xl shadow-slate-200/50 rounded-3xl overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 p-4 border-b">
+      <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-6 p-6 border-b border-slate-100 bg-slate-50/30">
         <div>
-          <h2 className="font-semibold text-lg">{leads.length} Leads Found</h2>
-          <p className="text-sm text-gray-500">
-            {profession} in {location}
+          <div className="flex items-center gap-2 mb-1">
+            <h2 className="font-bold text-2xl text-slate-900 tracking-tight">
+              {leads.length} Leads Discovered
+            </h2>
+            <span className="bg-blue-100 text-blue-700 text-xs font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
+              Real-time
+            </span>
+          </div>
+          <p className="text-sm text-slate-500 font-medium">
+            <span className="text-slate-900 font-semibold">{profession}</span> in <span className="text-slate-900 font-semibold">{location}</span> · showing up to {limit} results
           </p>
         </div>
 
-        <div className="flex flex-wrap gap-2">
-          <button className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 text-sm">
-            Excel
+        <div className="flex flex-wrap gap-3 items-center">
+          <button
+            onClick={exportToExcel}
+            className="inline-flex items-center gap-2 bg-slate-900 text-white px-5 py-2.5 rounded-xl hover:bg-slate-800 text-sm font-semibold transition-all shadow-lg shadow-slate-200 active:scale-95"
+          >
+            <Download size={18} className="text-blue-400" />
+            Export XLSX
           </button>
-          <button className="border px-4 py-2 rounded-lg hover:bg-gray-100 text-sm">
-            CSV
+          <button
+            onClick={exportToCsv}
+            className="inline-flex items-center gap-2 border-2 border-slate-200 bg-white text-slate-700 px-5 py-2.5 rounded-xl hover:bg-slate-50 hover:border-slate-300 text-sm font-semibold transition-all active:scale-95"
+          >
+            <Download size={18} className="text-slate-400" />
+            Export CSV
           </button>
         </div>
       </div>
 
-      {/* Table */}
+      {/* Table Container */}
       <div className="overflow-x-auto">
-        <table className="min-w-[900px] w-full text-sm">
-          <thead className="bg-gray-50 text-gray-600 sticky top-0 z-10">
-            <tr>
-              <th className="p-3 text-left">#</th>
-              <th className="p-3 text-left">Name</th>
-              <th className="p-3 text-left">Phone</th>
-              <th className="p-3 text-left">Reviews</th>
-              <th className="p-3 text-left">Website</th>
-              <th className="p-3 text-left">Pitched</th>
-              <th className="p-3 text-left">Date</th>
-              <th className="p-3 text-left">Remark</th>
-              <th className="p-3 text-left">Converted</th>
+        <table className="w-full text-sm text-left border-collapse">
+          <thead>
+            <tr className="bg-slate-50 text-slate-500 border-b border-slate-100">
+              <th className="px-4 py-4 font-bold uppercase tracking-wider text-[11px]">#</th>
+              <th className="px-6 py-4 font-bold uppercase tracking-wider text-[11px]">Business Details</th>
+              <th className="px-4 py-4 font-bold uppercase tracking-wider text-[11px]">Contact</th>
+              <th className="px-4 py-4 font-bold uppercase tracking-wider text-[11px]">Reputation</th>
+              <th className="px-4 py-4 font-bold uppercase tracking-wider text-[11px]">Links</th>
             </tr>
           </thead>
 
-          <tbody>
+          <tbody className="divide-y divide-slate-100">
             {leads.length > 0 ? (
               leads.map((lead, index) => (
                 <tr
                   key={index}
-                  className="border-t hover:bg-gray-50 transition"
+                  className="group hover:bg-blue-50/30 transition-colors duration-200"
                 >
-                  <td className="p-3">{index + 1}</td>
+                  <td className="px-4 py-5 text-slate-400 font-mono text-xs">{index + 1}</td>
 
-                  {/* Name + Address */}
-                  <td className="p-3">
-                    <p className="font-medium">{lead.name || "-"}</p>
-                    <p className="text-xs text-gray-500 line-clamp-1">
-                      {lead.address || "-"}
-                    </p>
+                  {/* Business Details */}
+                  <td className="px-6 py-5 max-w-xs">
+                    <div className="flex flex-col gap-1">
+                      <p className="font-bold text-slate-900 text-base group-hover:text-blue-700 transition-colors">
+                        {lead.name || "Unnamed Business"}
+                      </p>
+                      <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed">
+                        {lead.address || "No address provided"}
+                      </p>
+                    </div>
                   </td>
 
-                  <td className="p-3">{lead.phone || "-"}</td>
-
-                  <td className="p-3">{lead.reviews || "N/A"}</td>
-
-                  <td className="p-3">
-                    {lead.website ? (
-                      <a
-                        href={getValidUrl(lead.website)}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-500 hover:underline"
-                      >
-                        Visit
-                      </a>
-                    ) : (
-                      <span className="text-gray-400">No site</span>
-                    )}
+                  {/* Contact */}
+                  <td className="px-4 py-5">
+                    <div className="flex flex-col gap-1">
+                      <span className="text-slate-900 font-semibold text-sm">
+                        {lead.phone || "No phone"}
+                      </span>
+                      <span className="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">
+                        Direct Line
+                      </span>
+                    </div>
                   </td>
 
-                  {/* CRM fields */}
-                  <td className="p-3">
-                    <input type="checkbox" className="cursor-pointer" />
+                  {/* Reputation */}
+                  <td className="px-4 py-5">
+                    <div className="flex flex-col gap-2">
+                      <div className="inline-flex items-center gap-1.5 rounded-lg bg-amber-50 px-2 py-1 w-fit border border-amber-100">
+                        <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                        <span className="text-xs font-bold text-amber-700">
+                          {lead.rating ? lead.rating.toFixed(1) : "N/A"}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-1 text-slate-400 text-[11px] font-medium">
+                        <MessageSquare className="w-3 h-3" />
+                        {lead.reviews || 0} reviews
+                      </div>
+                    </div>
                   </td>
 
-                  <td className="p-3">
-                    <input
-                      type="date"
-                      className="border rounded px-2 py-1 text-xs"
-                    />
-                  </td>
-
-                  <td className="p-3">
-                    <input
-                      type="text"
-                      placeholder="Remark"
-                      className="border rounded px-2 py-1 text-xs w-28"
-                    />
-                  </td>
-                  <td className="p-3">
-                    <input type="checkbox" className="cursor-pointer" />
+                  {/* Links */}
+                  <td className="px-4 py-5">
+                    <div className="flex gap-2">
+                      {lead.mapUrl ? (
+                        <a
+                          href={getValidUrl(lead.mapUrl)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="p-2 bg-slate-100 text-slate-600 rounded-lg hover:bg-blue-100 hover:text-blue-600 transition-all"
+                          title="View on Google Maps"
+                        >
+                          <Map size={18} />
+                        </a>
+                      ) : (
+                        <div className="p-2 bg-slate-50 text-slate-300 rounded-lg cursor-not-allowed">
+                          <Map size={18} />
+                        </div>
+                      )}
+                      {lead.website ? (
+                        <a
+                          href={getValidUrl(lead.website)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="p-2 bg-slate-100 text-slate-600 rounded-lg hover:bg-blue-100 hover:text-blue-600 transition-all"
+                          title="Visit Website"
+                        >
+                          <Globe size={18} />
+                        </a>
+                      ) : (
+                        <div className="p-2 bg-slate-50 text-slate-300 rounded-lg cursor-not-allowed">
+                          <Globe size={18} />
+                        </div>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan="8" className="text-center p-6 text-gray-500">
-                  No leads found
+                <td colSpan="6" className="text-center py-20 text-slate-400">
+                  <div className="flex flex-col items-center gap-3">
+                    <div className="bg-slate-50 p-4 rounded-full">
+                      <Globe className="w-8 h-8 text-slate-200" />
+                    </div>
+                    <p className="font-medium">No results to display</p>
+                  </div>
                 </td>
               </tr>
             )}

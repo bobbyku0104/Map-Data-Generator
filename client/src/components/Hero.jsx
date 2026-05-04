@@ -4,19 +4,20 @@ import { Search, MapPin, Briefcase, Sparkles } from "lucide-react";
 export default function Hero({ onSearch }) {
   const [location, setLocation] = useState("");
   const [profession, setProfession] = useState("");
+  const [limit, setLimit] = useState(25);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (location && profession) {
       setIsLoading(true);
-      await onSearch(location, profession);
+      await onSearch(location, profession, limit);
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="relative overflow-hidden bg-gradient-to-br from-blue-50 via-white to-purple-50">
+    <div className="relative overflow-hidden bg-linear-to-br from-blue-50 via-white to-purple-50">
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
@@ -32,7 +33,7 @@ export default function Hero({ onSearch }) {
         </div>
 
         {/* Main Heading */}
-        <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-4">
+        <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold bg-linear-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-4">
           Generate Business
           <br />
           Leads Instantly
@@ -46,11 +47,11 @@ export default function Hero({ onSearch }) {
 
         {/* Search Card */}
         <div className="w-full max-w-3xl mx-auto">
-          <div className="bg-white/80 backdrop-blur-sm shadow-2xl rounded-2xl p-6 md:p-8 border border-gray-100">
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid md:grid-cols-2 gap-4">
+          <div className="bg-white/95 backdrop-blur-sm shadow-2xl rounded-4xl p-6 md:p-8 border border-gray-100">
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <div className="grid grid-cols-1 md:grid-cols-[2fr_2fr_1fr] gap-4">
                 {/* Location Input */}
-                <div className="relative group">
+                <div className="relative group flex items-center justify-center">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <MapPin className="h-5 w-5 text-gray-400 group-focus-within:text-blue-500 transition-colors" />
                   </div>
@@ -59,12 +60,12 @@ export default function Hero({ onSearch }) {
                     placeholder="Enter location (e.g., New York, NY)"
                     value={location}
                     onChange={(e) => setLocation(e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all text-gray-700 placeholder-gray-400"
+                    className="w-full h-14 pl-10 pr-4 border-2 border-gray-200 rounded-2xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all text-gray-700 placeholder-gray-400"
                   />
                 </div>
 
                 {/* Profession Input */}
-                <div className="relative group">
+                <div className="relative group flex items-center justify-center">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <Briefcase className="h-5 w-5 text-gray-400 group-focus-within:text-blue-500 transition-colors" />
                   </div>
@@ -73,7 +74,19 @@ export default function Hero({ onSearch }) {
                     placeholder="Enter profession (e.g., Plumber, Dentist)"
                     value={profession}
                     onChange={(e) => setProfession(e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all text-gray-700 placeholder-gray-400"
+                    className="w-full h-14 pl-10 pr-4 border-2 border-gray-200 rounded-2xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all text-gray-700 placeholder-gray-400"
+                  />
+                </div>
+
+                {/* Result Limit Input */}
+                <div className="relative group flex items-center justify-center">
+                  <input
+                    type="number"
+                    min={1}
+                    max={100}
+                    value={limit}
+                    onChange={(e) => setLimit(Number(e.target.value))}
+                    className="w-full h-14 pr-4 border-2 border-gray-200 rounded-2xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all text-gray-700 flex items-center justify-center"
                   />
                 </div>
               </div>
@@ -82,7 +95,7 @@ export default function Hero({ onSearch }) {
               <button
                 type="submit"
                 disabled={!location || !profession || isLoading}
-                className="relative w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3.5 rounded-xl font-semibold text-lg transition-all transform hover:scale-[1.02] hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 group"
+                className="relative w-full h-14 bg-linear-to-r from-blue-600 to-purple-600 text-white rounded-2xl font-semibold text-lg transition-all transform hover:scale-[1.02] hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 group"
               >
                 {isLoading ? (
                   <div className="flex items-center justify-center gap-2">
@@ -119,22 +132,6 @@ export default function Hero({ onSearch }) {
                   </button>
                 ))}
               </div>
-            </div>
-          </div>
-
-          {/* Stats */}
-          <div className="mt-8 flex flex-wrap justify-center gap-6 md:gap-10">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-gray-800">10K+</div>
-              <div className="text-sm text-gray-500">Businesses Found</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-gray-800">50+</div>
-              <div className="text-sm text-gray-500">Cities Covered</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-gray-800">30s</div>
-              <div className="text-sm text-gray-500">Average Search Time</div>
             </div>
           </div>
         </div>
