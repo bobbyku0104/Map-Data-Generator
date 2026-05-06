@@ -12,8 +12,8 @@ export default function LeadsTable({ leads, location, profession, limit }) {
     const exportData = leads.map((lead) => ({
       name: lead.name || "",
       phone: lead.phone || "",
-      email: "",
-      link: lead.mapUrl || "",
+      email: lead.email || "",
+      link: lead.link || "",
       rating: lead.rating || "",
       reviews: lead.reviews || "",
     }));
@@ -39,8 +39,8 @@ export default function LeadsTable({ leads, location, profession, limit }) {
     const exportData = leads.map((lead) => ({
       name: lead.name || "",
       phone: lead.phone || "",
-      email: "",
-      link: lead.mapUrl || "",
+      email: lead.email || "",
+      link: lead.link || "",
       rating: lead.rating || "",
       reviews: lead.reviews || "",
     }));
@@ -100,6 +100,7 @@ export default function LeadsTable({ leads, location, profession, limit }) {
               <th className="px-4 py-4 font-bold uppercase tracking-wider text-[11px]">#</th>
               <th className="px-6 py-4 font-bold uppercase tracking-wider text-[11px]">Business Details</th>
               <th className="px-4 py-4 font-bold uppercase tracking-wider text-[11px]">Contact</th>
+              <th className="px-4 py-4 font-bold uppercase tracking-wider text-[11px]">Email</th>
               <th className="px-4 py-4 font-bold uppercase tracking-wider text-[11px]">Reputation</th>
               <th className="px-4 py-4 font-bold uppercase tracking-wider text-[11px]">Links</th>
             </tr>
@@ -138,13 +139,22 @@ export default function LeadsTable({ leads, location, profession, limit }) {
                     </div>
                   </td>
 
+                  {/* Email */}
+                  <td className="px-4 py-5">
+                    <div className="flex flex-col gap-1">
+                      <span className="text-slate-900 font-medium text-sm break-all max-w-[150px]">
+                        {lead.email || "N/A"}
+                      </span>
+                    </div>
+                  </td>
+
                   {/* Reputation */}
                   <td className="px-4 py-5">
                     <div className="flex flex-col gap-2">
                       <div className="inline-flex items-center gap-1.5 rounded-lg bg-amber-50 px-2 py-1 w-fit border border-amber-100">
                         <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
                         <span className="text-xs font-bold text-amber-700">
-                          {lead.rating ? lead.rating.toFixed(1) : "N/A"}
+                          {typeof lead.rating === 'number' ? lead.rating.toFixed(1) : lead.rating}
                         </span>
                       </div>
                       <div className="flex items-center gap-1 text-slate-400 text-[11px] font-medium">
@@ -157,9 +167,9 @@ export default function LeadsTable({ leads, location, profession, limit }) {
                   {/* Links */}
                   <td className="px-4 py-5">
                     <div className="flex gap-2">
-                      {lead.mapUrl ? (
+                      {lead.link ? (
                         <a
-                          href={getValidUrl(lead.mapUrl)}
+                          href={getValidUrl(lead.link)}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="p-2 bg-slate-100 text-slate-600 rounded-lg hover:bg-blue-100 hover:text-blue-600 transition-all"

@@ -83,7 +83,7 @@ export default function Hero({ onSearch }) {
                   <input
                     type="number"
                     min={1}
-                    max={100}
+                    max={500}
                     value={limit}
                     onChange={(e) => setLimit(Number(e.target.value))}
                     className="w-full h-14 pr-4 border-2 border-gray-200 rounded-2xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all text-gray-700 flex items-center justify-center"
