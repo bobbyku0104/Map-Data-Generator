@@ -1,15 +1,25 @@
+//
+
 const express = require("express");
 const cors = require("cors");
 const axios = require("axios");
-require("dotenv").config();
+const dotenv = require("dotenv");
+
+const connectDB = require("./config/db");
+
+dotenv.config();
+
+// Connect MongoDB
+connectDB();
 
 const app = express();
+
 app.use(cors());
 app.use(express.json());
 
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 
-// Home route
+// Home Route
 app.get("/", (req, res) => {
   res.send("Server running 🚀");
 });
@@ -18,9 +28,17 @@ app.get("/", (req, res) => {
 app.get("/clients/:keyword", async (req, res) => {
   try {
     const keyword = req.params.keyword;
-    const requestedLimit = Number(req.query.limit);
-    const limit = Number.isInteger(requestedLimit) && requestedLimit > 0 && requestedLimit <= 500 ? requestedLimit : 50;
 
+    const requestedLimit = Number(req.query.limit);
+
+    const limit =
+      Number.isInteger(requestedLimit) &&
+      requestedLimit > 0 &&
+      requestedLimit <= 500
+        ? requestedLimit
+        : 50;
+
+    // API Request
     const response = await axios.get(
       "https://api.openwebninja.com/local-business-data/search",
       {
@@ -39,6 +57,7 @@ app.get("/clients/:keyword", async (req, res) => {
 
     console.log("Sample Data:", data[0]);
 
+    // Format Leads
     const leads = data.map((item) => {
       const phone =
         item.phone ||
@@ -56,35 +75,39 @@ app.get("/clients/:keyword", async (req, res) => {
         (item.place_id
           ? `https://www.google.com/maps/place/?q=place_id:${item.place_id}`
           : item.latitude && item.longitude
-          ? `https://www.google.com/maps/search/?api=1&query=${item.latitude},${item.longitude}`
-          : "");
+            ? `https://www.google.com/maps/search/?api=1&query=${item.latitude},${item.longitude}`
+            : "");
 
       return {
         name: item.name || "N/A",
         address: item.address || "N/A",
         phone: phone,
         email: item.email || item.contact?.email || "",
-        rating: typeof item.rating === 'number' ? item.rating : "N/A",
+        rating: typeof item.rating === "number" ? item.rating : "N/A",
         website: item.website || "",
-        reviews: typeof reviewCount === 'number' ? reviewCount : (reviewCount || 0),
+        reviews:
+          typeof reviewCount === "number" ? reviewCount : reviewCount || 0,
         link: mapUrl,
       };
     });
+
+    // Filter businesses without website
     const filteredLeads = leads.filter(
       (item) => !item.website || item.website === "N/A",
     );
 
-    res.json(filteredLeads);
+    res.status(200).json(filteredLeads);
   } catch (error) {
     console.error("ERROR:", error.response?.data || error.message);
 
     res.status(500).json({
-      error: "Failed to fetch leads",
+      success: false,
+      message: "Failed to fetch leads",
     });
   }
 });
 
-//  Start server
+// Start Server
 app.listen(PORT, () => {
-  console.log(` Server running on port ${PORT}`);
+  console.log(`Server running on port ${PORT} 🚀`);
 });
