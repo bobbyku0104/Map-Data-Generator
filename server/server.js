@@ -19,7 +19,7 @@ app.get("/clients/:keyword", async (req, res) => {
   try {
     const keyword = req.params.keyword;
     const requestedLimit = Number(req.query.limit);
-    const limit = Number.isInteger(requestedLimit) && requestedLimit > 0 && requestedLimit <= 100 ? requestedLimit : 50;
+    const limit = Number.isInteger(requestedLimit) && requestedLimit > 0 && requestedLimit <= 500 ? requestedLimit : 50;
 
     const response = await axios.get(
       "https://api.openwebninja.com/local-business-data/search",
@@ -63,10 +63,11 @@ app.get("/clients/:keyword", async (req, res) => {
         name: item.name || "N/A",
         address: item.address || "N/A",
         phone: phone,
-        rating: item.rating || "N/A",
+        email: item.email || item.contact?.email || "",
+        rating: typeof item.rating === 'number' ? item.rating : "N/A",
         website: item.website || "",
-        reviews: reviewCount,
-        mapUrl,
+        reviews: typeof reviewCount === 'number' ? reviewCount : (reviewCount || 0),
+        link: mapUrl,
       };
     });
     const filteredLeads = leads.filter(
