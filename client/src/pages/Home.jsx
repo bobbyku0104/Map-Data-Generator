@@ -9,7 +9,7 @@ export default function Home() {
   const [leads, setLeads] = useState([]);
   const [location, setLocation] = useState("");
   const [profession, setProfession] = useState("");
-  const [searchLimit, setSearchLimit] = useState(25);
+  const [searchLimit, setSearchLimit] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [showScrollTop, setShowScrollTop] = useState(false);
