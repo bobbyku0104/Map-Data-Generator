@@ -32,8 +32,14 @@ export default function Home() {
 
       const keyword = encodeURIComponent(`${prof} in ${loc}`);
 
+      const token = localStorage.getItem("token");
       const res = await axios.get(
-        `http://localhost:5000/clients/${keyword}?limit=${limit}`
+        `http://localhost:5000/clients/${keyword}?limit=${limit}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
 
       setLeads(res.data || []);
@@ -48,6 +54,12 @@ export default function Home() {
         }, 100);
       }
     } catch (err) {
+      if (err.response?.status === 401) {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        window.location.href = "/";
+        return;
+      }
       setError(err.response?.data?.message || "Failed to fetch data. Please try again.");
     } finally {
       setLoading(false);
