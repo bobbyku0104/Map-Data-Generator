@@ -105,6 +105,10 @@ export default function Home() {
     }
   };
 
+  const handleCloseModal = () => {
+    setShowDeniedModal(false);
+  };
+
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -194,39 +198,183 @@ export default function Home() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-in fade-in duration-300">
           {/* Backdrop */}
           <div 
-            className="absolute inset-0 bg-slate-950/60 backdrop-blur-md cursor-pointer"
-            onClick={() => setShowDeniedModal(false)}
+            className="absolute inset-0 bg-slate-950/80 backdrop-blur-md cursor-pointer"
+            onClick={handleCloseModal}
           ></div>
           
-          {/* Modal Container */}
-          <div className="relative bg-white/95 backdrop-blur-lg border border-slate-200 shadow-2xl rounded-3xl p-8 max-w-sm w-full text-center animate-in zoom-in-95 duration-200 z-10">
-            <div className="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-5 shadow-inner">
-              <AlertCircle className="w-8 h-8 animate-bounce" />
-            </div>
+          {/* Modal Container (Sleek Dark Mode Glassmorphism) */}
+          <div className="relative bg-slate-900/95 text-white backdrop-blur-2xl border border-slate-800 shadow-2xl rounded-[40px] p-6 sm:p-10 max-w-4xl w-full text-center animate-in zoom-in-95 duration-200 z-10 overflow-y-auto max-h-[90vh] no-scrollbar">
             
-            <h3 className="text-2xl font-extrabold text-slate-900 tracking-tight">
-              Free Access Denied
-            </h3>
-            
-            <p className="text-slate-500 mt-3 font-medium leading-relaxed">
-              You have already used your first free lead search access. Sourcing more high-value leads requires a subscription.
-            </p>
-            
-            <div className="mt-6 flex flex-col gap-3">
-              <button 
-                onClick={() => alert("Subscription purchase page coming soon!")}
-                className="w-full bg-blue-600 hover:bg-blue-750 text-white p-3 rounded-xl font-bold transition-all duration-200 shadow-lg shadow-blue-200/50 hover:shadow-xl hover:-translate-y-0.5 cursor-pointer"
-              >
-                Upgrade to Pro
-              </button>
+            {/* Close Button X */}
+            <button 
+              onClick={handleCloseModal}
+              className="absolute top-6 right-6 text-slate-400 hover:text-white transition-colors cursor-pointer p-2.5 rounded-full hover:bg-white/10"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+
+            {/* Icon & Title */}
+            <div className="text-center max-w-xl mx-auto mb-8">
+              <div className="w-14 h-14 bg-red-500/10 text-red-500 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-red-500/20 shadow-inner">
+                <AlertCircle className="w-7 h-7 animate-bounce" />
+              </div>
               
+              <h3 className="text-3xl font-extrabold text-white tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-100 to-slate-400">
+                Free Access Denied
+              </h3>
+              
+              <p className="text-slate-400 mt-2 font-medium leading-relaxed">
+                You have already used your first free lead search access. Sourcing more high-value leads requires a subscription. Please upgrade to continue.
+              </p>
+            </div>
+
+            {/* 3 Subscription Plans Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              
+              {/* Plan 1: Starter */}
+              <div className="flex flex-col bg-slate-800/40 border border-slate-800 rounded-3xl p-6 transition-all duration-500 hover:border-blue-500/50 hover:shadow-2xl hover:shadow-blue-500/10 hover:-translate-y-2 hover:scale-[1.03] text-left relative overflow-hidden group">
+                {/* Shine Sweep Effect on Hover */}
+                <div className="animate-shine"></div>
+                
+                <div className="mb-4">
+                  <h4 className="text-lg font-bold text-slate-200 group-hover:text-white transition-colors duration-300">Starter</h4>
+                  <p className="text-xs text-slate-400 mt-1">Perfect for getting started</p>
+                </div>
+                <div className="my-3 flex items-baseline">
+                  <span className="text-4xl font-extrabold text-white group-hover:scale-105 transition-transform duration-300 origin-left">$9</span>
+                  <span className="text-slate-400 text-sm ml-1">/ month</span>
+                </div>
+                
+                <ul className="space-y-2.5 my-6 text-sm text-slate-300 flex-grow">
+                  <li className="flex items-center gap-2 group/item">
+                    <Zap className="w-4 h-4 text-blue-400 fill-current transition-all duration-300 group-hover/item:scale-125 group-hover/item:rotate-12" />
+                    <span className="group-hover:text-slate-200 transition-colors">500 Leads / month</span>
+                  </li>
+                  <li className="flex items-center gap-2 group/item">
+                    <Zap className="w-4 h-4 text-blue-400 fill-current transition-all duration-300 group-hover/item:scale-125 group-hover/item:rotate-12" />
+                    <span className="group-hover:text-slate-200 transition-colors">Basic Lead Sourcing</span>
+                  </li>
+                  <li className="flex items-center gap-2 group/item">
+                    <Zap className="w-4 h-4 text-blue-400 fill-current transition-all duration-300 group-hover/item:scale-125 group-hover/item:rotate-12" />
+                    <span className="group-hover:text-slate-200 transition-colors">CSV / Email Export</span>
+                  </li>
+                  <li className="flex items-center gap-2 group/item">
+                    <Zap className="w-4 h-4 text-blue-400 fill-current transition-all duration-300 group-hover/item:scale-125 group-hover/item:rotate-12" />
+                    <span className="group-hover:text-slate-200 transition-colors">Standard Support</span>
+                  </li>
+                </ul>
+
+                <button 
+                  onClick={() => alert("Starter Subscription coming soon!")}
+                  className="w-full bg-slate-800 hover:bg-gradient-to-r hover:from-blue-600 hover:to-indigo-600 text-white py-3 rounded-xl font-bold transition-all duration-300 cursor-pointer text-center text-sm border border-slate-700 hover:border-transparent hover:shadow-lg hover:shadow-blue-500/20 active:scale-[0.98]"
+                >
+                  Pay Now
+                </button>
+              </div>
+
+              {/* Plan 2: Pro (Unique Glowing Card) */}
+              <div className="flex flex-col bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 border-none rounded-3xl p-6 transition-all duration-500 hover:shadow-2xl hover:shadow-blue-400/40 hover:-translate-y-3 hover:scale-[1.04] text-left relative scale-100 lg:scale-[1.02] shadow-xl overflow-hidden group">
+                {/* Shine Sweep Effect on Hover */}
+                <div className="animate-shine"></div>
+                
+                <div className="absolute top-0 right-6 -translate-y-1/2 bg-white text-blue-700 text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full shadow-md border border-blue-100 animate-pulse">
+                  Most Popular
+                </div>
+                <div className="mb-4">
+                  <h4 className="text-lg font-extrabold text-white">Professional</h4>
+                  <p className="text-xs text-blue-100 mt-1">Accelerate your pipeline</p>
+                </div>
+                <div className="my-3 flex items-baseline">
+                  <span className="text-4xl font-black text-white group-hover:scale-105 transition-transform duration-300 origin-left">$29</span>
+                  <span className="text-blue-100 text-sm ml-1">/ month</span>
+                </div>
+                
+                <ul className="space-y-2.5 my-6 text-sm text-white flex-grow">
+                  <li className="flex items-center gap-2 font-bold text-yellow-300 group/item">
+                    <Zap className="w-4 h-4 text-yellow-300 fill-current transition-all duration-300 group-hover/item:scale-125 group-hover/item:rotate-12" />
+                    <span>2,500 Leads / month</span>
+                  </li>
+                  <li className="flex items-center gap-2 group/item">
+                    <Zap className="w-4 h-4 text-white fill-current transition-all duration-300 group-hover/item:scale-125 group-hover/item:rotate-12" />
+                    <span>Advanced Maps Sourcing</span>
+                  </li>
+                  <li className="flex items-center gap-2 group/item">
+                    <Zap className="w-4 h-4 text-white fill-current transition-all duration-300 group-hover/item:scale-125 group-hover/item:rotate-12" />
+                    <span>Direct Excel / XLSX Export</span>
+                  </li>
+                  <li className="flex items-center gap-2 group/item">
+                    <Zap className="w-4 h-4 text-white fill-current transition-all duration-300 group-hover/item:scale-125 group-hover/item:rotate-12" />
+                    <span>WhatsApp / Email Lead Sync</span>
+                  </li>
+                  <li className="flex items-center gap-2 group/item">
+                    <Zap className="w-4 h-4 text-white fill-current transition-all duration-300 group-hover/item:scale-125 group-hover/item:rotate-12" />
+                    <span>Priority 24/7 Support</span>
+                  </li>
+                </ul>
+
+                <button 
+                  onClick={() => alert("Pro Subscription coming soon!")}
+                  className="w-full bg-white hover:bg-gradient-to-r hover:from-yellow-400 hover:to-orange-500 hover:text-white text-blue-700 py-3 rounded-xl font-bold transition-all duration-300 cursor-pointer text-center text-sm shadow-md hover:shadow-lg hover:shadow-yellow-500/20 active:scale-[0.98]"
+                >
+                 Pay Now
+                </button>
+              </div>
+
+              {/* Plan 3: Enterprise */}
+              <div className="flex flex-col bg-slate-950 border border-slate-800 rounded-3xl p-6 transition-all duration-500 hover:border-purple-500/50 hover:shadow-2xl hover:shadow-purple-500/10 hover:-translate-y-2 hover:scale-[1.03] text-left relative text-white overflow-hidden group">
+                {/* Shine Sweep Effect on Hover */}
+                <div className="animate-shine"></div>
+                
+                <div className="mb-4">
+                  <h4 className="text-lg font-bold text-slate-200 group-hover:text-white transition-colors duration-300">Enterprise</h4>
+                  <p className="text-xs text-slate-400 mt-1">For power-users and teams</p>
+                </div>
+                <div className="my-3 flex items-baseline">
+                  <span className="text-4xl font-extrabold text-white group-hover:scale-105 transition-transform duration-300 origin-left">$89</span>
+                  <span className="text-slate-400 text-sm ml-1">/ month</span>
+                </div>
+                
+                <ul className="space-y-2.5 my-6 text-sm text-slate-300 flex-grow">
+                  <li className="flex items-center gap-2 text-blue-400 group/item">
+                    <Zap className="w-4 h-4 text-blue-400 fill-current transition-all duration-300 group-hover/item:scale-125 group-hover/item:rotate-12" />
+                    <span className="group-hover:text-slate-200 transition-colors">Unlimited Leads / month</span>
+                  </li>
+                  <li className="flex items-center gap-2 group/item">
+                    <Zap className="w-4 h-4 text-blue-400 fill-current transition-all duration-300 group-hover/item:scale-125 group-hover/item:rotate-12" />
+                    <span className="group-hover:text-slate-200 transition-colors">Dedicated Scraping Server</span>
+                  </li>
+                  <li className="flex items-center gap-2 group/item">
+                    <Zap className="w-4 h-4 text-blue-400 fill-current transition-all duration-300 group-hover/item:scale-125 group-hover/item:rotate-12" />
+                    <span className="group-hover:text-slate-200 transition-colors">Automated CRM Push (Webhook)</span>
+                  </li>
+                  <li className="flex items-center gap-2 group/item">
+                    <Zap className="w-4 h-4 text-blue-400 fill-current transition-all duration-300 group-hover/item:scale-125 group-hover/item:rotate-12" />
+                    <span className="group-hover:text-slate-200 transition-colors">Dedicated Account Manager</span>
+                  </li>
+                </ul>
+
+                <button 
+                  onClick={() => alert("Enterprise Subscription coming soon!")}
+                  className="w-full bg-slate-800 hover:bg-gradient-to-r hover:from-purple-600 hover:to-pink-600 text-white py-3 rounded-xl font-bold transition-all duration-300 cursor-pointer text-center text-sm border border-slate-700 hover:border-transparent hover:shadow-lg hover:shadow-purple-500/20 active:scale-[0.98]"
+                >
+                  Pay Now
+                </button>
+              </div>
+
+            </div>
+
+            {/* Footer Close Button */}
+            <div className="mt-8 pt-4 border-t border-slate-800 flex items-center justify-center gap-3">
               <button 
-                onClick={() => setShowDeniedModal(false)}
-                className="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 p-3 rounded-xl font-semibold transition-all duration-150 cursor-pointer"
+                onClick={handleCloseModal}
+                className="px-6 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl font-semibold transition-all duration-150 cursor-pointer text-sm border border-slate-750"
               >
-                Close
+                Close & Stay on Search Page
               </button>
             </div>
+
           </div>
         </div>
       )}
