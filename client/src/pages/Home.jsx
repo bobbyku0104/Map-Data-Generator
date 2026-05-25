@@ -33,8 +33,9 @@ export default function Home() {
       const keyword = encodeURIComponent(`${prof} in ${loc}`);
 
       const token = localStorage.getItem("token");
+      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:5000";
       const res = await axios.get(
-        `http://localhost:5000/clients/${keyword}?limit=${limit}`,
+        `${apiUrl}/clients/${keyword}?limit=${limit}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

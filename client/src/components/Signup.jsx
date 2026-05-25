@@ -36,7 +36,8 @@ export default function Signup() {
 
     try {
       setLoading(true);
-      const res = await axios.post("http://localhost:5000/api/auth/register", {
+      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:5000";
+      const res = await axios.post(`${apiUrl}/api/auth/register`, {
         name,
         email,
         password,
