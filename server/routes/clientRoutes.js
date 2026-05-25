@@ -13,10 +13,7 @@ router.post("/client-access", protect, async (req, res) => {
 
         // first free access
         if (!user.freeUsed) {
-            user.freeUsed = true;
-            user.leadLimit = 25;
-            await user.save();
-            return res.status(200).json({ message: "Free access granted", leadLimit: user.leadLimit });
+            return res.status(200).json({ message: "Free access available", leadLimit: 25 });
         }        
 
         // second time

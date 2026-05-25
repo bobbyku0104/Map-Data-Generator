@@ -13,10 +13,44 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const [showDeniedModal, setShowDeniedModal] = useState(false);
+  const [checkingAccess, setCheckingAccess] = useState(true);
 
   const tableRef = useRef(null);
 
   useEffect(() => {
+    const checkAccess = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:5000";
+        await axios.post(
+          `${apiUrl}/api/client-access`,
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+      } catch (err) {
+        if (err.response?.status === 401) {
+          localStorage.removeItem("token");
+          localStorage.removeItem("user");
+          window.location.href = "/";
+          return;
+        }
+        if (err.response?.status === 403) {
+          setShowDeniedModal(true);
+        } else {
+          setError("Verification failed. Please reload or contact support.");
+        }
+      } finally {
+        setCheckingAccess(false);
+      }
+    };
+
+    checkAccess();
+
     const handleScroll = () => {
       setShowScrollTop(window.scrollY > 500);
     };
@@ -61,6 +95,10 @@ export default function Home() {
         window.location.href = "/";
         return;
       }
+      if (err.response?.status === 403) {
+        setShowDeniedModal(true);
+        return;
+      }
       setError(err.response?.data?.message || "Failed to fetch data. Please try again.");
     } finally {
       setLoading(false);
@@ -70,6 +108,21 @@ export default function Home() {
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
+
+  if (checkingAccess) {
+    return (
+      <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center">
+        <div className="relative">
+          <div className="w-20 h-20 border-4 border-blue-500/20 border-t-blue-500 rounded-full animate-spin"></div>
+          <Zap className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 text-blue-500 animate-pulse" />
+        </div>
+        <p className="mt-6 text-slate-400 font-semibold tracking-wider animate-pulse">
+          VERIFYING ACCESS CONTROL...
+        </p>
+      </div>
+    );
+  }
+
 
   return (
     <div className="min-h-screen bg-slate-50/50 flex flex-col">
@@ -135,6 +188,48 @@ export default function Home() {
       >
         <ChevronUp className="w-6 h-6" />
       </button>
+
+      {/* Premium Access Denied Modal Popup */}
+      {showDeniedModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-in fade-in duration-300">
+          {/* Backdrop */}
+          <div 
+            className="absolute inset-0 bg-slate-950/60 backdrop-blur-md cursor-pointer"
+            onClick={() => setShowDeniedModal(false)}
+          ></div>
+          
+          {/* Modal Container */}
+          <div className="relative bg-white/95 backdrop-blur-lg border border-slate-200 shadow-2xl rounded-3xl p-8 max-w-sm w-full text-center animate-in zoom-in-95 duration-200 z-10">
+            <div className="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-5 shadow-inner">
+              <AlertCircle className="w-8 h-8 animate-bounce" />
+            </div>
+            
+            <h3 className="text-2xl font-extrabold text-slate-900 tracking-tight">
+              Free Access Denied
+            </h3>
+            
+            <p className="text-slate-500 mt-3 font-medium leading-relaxed">
+              You have already used your first free lead search access. Sourcing more high-value leads requires a subscription.
+            </p>
+            
+            <div className="mt-6 flex flex-col gap-3">
+              <button 
+                onClick={() => alert("Subscription purchase page coming soon!")}
+                className="w-full bg-blue-600 hover:bg-blue-750 text-white p-3 rounded-xl font-bold transition-all duration-200 shadow-lg shadow-blue-200/50 hover:shadow-xl hover:-translate-y-0.5 cursor-pointer"
+              >
+                Upgrade to Pro
+              </button>
+              
+              <button 
+                onClick={() => setShowDeniedModal(false)}
+                className="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 p-3 rounded-xl font-semibold transition-all duration-150 cursor-pointer"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
