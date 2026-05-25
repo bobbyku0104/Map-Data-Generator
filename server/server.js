@@ -30,7 +30,9 @@ app.get("/", (req, res) => {
 });
 
 // Register Routes
+import clientRoutes from "./routes/clientRoutes.js";
 app.use("/api/auth", authRoutes);
+app.use("/api", clientRoutes);
 app.use("/", leadRoutes);
 
 const PORT = process.env.PORT || 5000;

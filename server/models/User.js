@@ -14,6 +14,14 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+   freeUsed: {
+      type: Boolean,
+      default: false,
+   },
+   leadLimit: {
+      type: Number,
+      default: 0,
+   },
 }, { timestamps: true });
 
 export default mongoose.model("User", userSchema);
