@@ -232,7 +232,7 @@ export default function Home() {
       <Navbar />
       
       <main className="flex-grow">
-        <Hero onSearch={handleSearch} />
+        <Hero onSearch={handleSearch} isPremium={JSON.parse(localStorage.getItem("user") || "{}")?.subscriptionActive} />
 
         <div className="max-w-7xl mx-auto px-4 pb-24">
           {loading && (

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Search, MapPin, Briefcase, Sparkles } from "lucide-react";
 
-export default function Hero({ onSearch }) {
+export default function Hero({ onSearch, isPremium }) {
   const [location, setLocation] = useState("");
   const [profession, setProfession] = useState("");
   const [limit, setLimit] = useState(25);
@@ -11,7 +11,7 @@ export default function Hero({ onSearch }) {
     e.preventDefault();
     if (location && profession) {
       setIsLoading(true);
-      await onSearch(location, profession, limit);
+      await onSearch(location, profession, isPremium ? limit : 25);
       setIsLoading(false);
     }
   };
@@ -48,6 +48,15 @@ export default function Hero({ onSearch }) {
         {/* Search Card */}
         <div className="w-full max-w-3xl mx-auto">
           <div className="bg-white/95 backdrop-blur-sm shadow-2xl rounded-4xl p-6 md:p-8 border border-gray-100">
+            {!isPremium && (
+              <div className="mb-6 p-4 bg-blue-50/70 border border-blue-100 rounded-2xl flex items-center gap-3 text-left text-blue-700 shadow-sm">
+                <Sparkles className="w-5 h-5 text-blue-600 flex-shrink-0 animate-bounce" />
+                <p className="text-xs sm:text-sm font-semibold leading-relaxed">
+                   <span className="text-blue-800 font-extrabold">Trial Offer:</span> Your first search is completely <span className="underline font-black text-blue-800">FREE</span> (Up to 25 Leads)! Afterward, an active subscription is required to continue lead sourcing.
+                </p>
+              </div>
+            )}
+
             <form onSubmit={handleSubmit} className="space-y-5">
               <div className="grid grid-cols-1 md:grid-cols-[2fr_2fr_1fr] gap-4">
                 {/* Location Input */}
@@ -85,9 +94,13 @@ export default function Hero({ onSearch }) {
                     type="number"
                     min={1}
                     max={500}
-                    value={limit}
-                    onChange={(e) => setLimit(Number(e.target.value))}
-                    className="w-full h-14 border-2 border-gray-200 rounded-2xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all text-gray-700 text-center"
+                    value={isPremium ? limit : 25}
+                    onChange={(e) => isPremium && setLimit(Number(e.target.value))}
+                    disabled={!isPremium}
+                    title={!isPremium ? "Upgrade to premium to unlock higher search limits" : ""}
+                    className={`w-full h-14 border-2 border-gray-200 rounded-2xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all text-gray-700 text-center ${
+                      !isPremium ? "bg-gray-100/80 cursor-not-allowed text-gray-400 font-semibold border-gray-100 shadow-inner" : ""
+                    }`}
                   />
                 </div>
               </div>
