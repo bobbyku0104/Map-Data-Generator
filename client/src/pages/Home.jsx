@@ -16,6 +16,105 @@ export default function Home() {
   const [showDeniedModal, setShowDeniedModal] = useState(false);
   const [checkingAccess, setCheckingAccess] = useState(true);
 
+  // Subscription Checkout states
+  const [paymentLoading, setPaymentLoading] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [successPlanName, setSuccessPlanName] = useState("");
+
+  const loadRazorpayScript = () => {
+    return new Promise((resolve) => {
+      if (window.Razorpay) {
+        resolve(true);
+        return;
+      }
+      const script = document.createElement("script");
+      script.src = "https://checkout.razorpay.com/v1/checkout.js";
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+  };
+
+  const handlePaymentCheckout = async (plan) => {
+    try {
+      setPaymentLoading(true);
+      const token = localStorage.getItem("token");
+      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:5000";
+      const userObj = JSON.parse(localStorage.getItem("user") || "{}");
+
+      // 1. Create checkout order on the server
+      const res = await axios.post(
+        `${apiUrl}/api/payments/checkout`,
+        { plan },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      // Real Razorpay Process
+      const scriptLoaded = await loadRazorpayScript();
+      if (!scriptLoaded) {
+        alert("Failed to load Razorpay SDK. Please verify your connection.");
+        return;
+      }
+
+      const options = {
+        key: res.data.keyId.trim(),
+        amount: res.data.amount,
+        currency: res.data.currency,
+        name: "LeadSync Sourcing Pro",
+        description: `${plan.toUpperCase()} Sourcing Subscription`,
+        order_id: res.data.orderId,
+        handler: async function (response) {
+          try {
+            const verifyRes = await axios.post(
+              `${apiUrl}/api/payments/verify`,
+              {
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+                plan,
+              },
+              {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
+              }
+            );
+
+            if (verifyRes.data.success) {
+              localStorage.setItem("user", JSON.stringify(verifyRes.data.user));
+              setSuccessPlanName(plan);
+              setShowDeniedModal(false);
+              setShowSuccessModal(true);
+            }
+          } catch (err) {
+            console.error("Signature verification error:", err);
+            alert(err.response?.data?.message || "Verification failed. Please contact support.");
+          }
+        },
+        prefill: {
+          name: userObj.name || "",
+          email: userObj.email || "",
+          contact: "9999999999", // Prefill contact number to directly load Razorpay's UPI & payment choices screen
+        },
+        theme: {
+          color: "#2563EB",
+        },
+      };
+
+      const rzp = new window.Razorpay(options);
+      rzp.open();
+    } catch (err) {
+      console.error("Checkout failed:", err);
+      alert(err.response?.data?.message || "Failed to initialize checkout. Try again.");
+    } finally {
+      setPaymentLoading(false);
+    }
+  };
+
   const tableRef = useRef(null);
 
   useEffect(() => {
@@ -230,6 +329,7 @@ export default function Home() {
               </p>
             </div>
 
+
             {/* 3 Subscription Plans Grid */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               
@@ -267,10 +367,11 @@ export default function Home() {
                 </ul>
 
                 <button 
-                  onClick={() => alert("Starter Subscription coming soon!")}
-                  className="w-full bg-slate-800 hover:bg-gradient-to-r hover:from-blue-600 hover:to-indigo-600 text-white py-3 rounded-xl font-bold transition-all duration-300 cursor-pointer text-center text-sm border border-slate-700 hover:border-transparent hover:shadow-lg hover:shadow-blue-500/20 active:scale-[0.98]"
+                  onClick={() => handlePaymentCheckout("starter")}
+                  disabled={paymentLoading}
+                  className="w-full bg-slate-800 hover:bg-gradient-to-r hover:from-blue-600 hover:to-indigo-600 text-white py-3 rounded-xl font-bold transition-all duration-300 cursor-pointer text-center text-sm border border-slate-700 hover:border-transparent hover:shadow-lg hover:shadow-blue-500/20 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Pay Now
+                  {paymentLoading ? "Processing..." : "Pay Now"}
                 </button>
               </div>
 
@@ -315,10 +416,11 @@ export default function Home() {
                 </ul>
 
                 <button 
-                  onClick={() => alert("Pro Subscription coming soon!")}
-                  className="w-full bg-white hover:bg-gradient-to-r hover:from-yellow-400 hover:to-orange-500 hover:text-white text-blue-700 py-3 rounded-xl font-bold transition-all duration-300 cursor-pointer text-center text-sm shadow-md hover:shadow-lg hover:shadow-yellow-500/20 active:scale-[0.98]"
+                  onClick={() => handlePaymentCheckout("pro")}
+                  disabled={paymentLoading}
+                  className="w-full bg-white hover:bg-gradient-to-r hover:from-yellow-400 hover:to-orange-500 hover:text-white text-blue-700 py-3 rounded-xl font-bold transition-all duration-300 cursor-pointer text-center text-sm shadow-md hover:shadow-lg hover:shadow-yellow-500/20 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                 Pay Now
+                 {paymentLoading ? "Processing..." : "Pay Now"}
                 </button>
               </div>
 
@@ -356,10 +458,11 @@ export default function Home() {
                 </ul>
 
                 <button 
-                  onClick={() => alert("Enterprise Subscription coming soon!")}
-                  className="w-full bg-slate-800 hover:bg-gradient-to-r hover:from-purple-600 hover:to-pink-600 text-white py-3 rounded-xl font-bold transition-all duration-300 cursor-pointer text-center text-sm border border-slate-700 hover:border-transparent hover:shadow-lg hover:shadow-purple-500/20 active:scale-[0.98]"
+                  onClick={() => handlePaymentCheckout("enterprise")}
+                  disabled={paymentLoading}
+                  className="w-full bg-slate-800 hover:bg-gradient-to-r hover:from-purple-600 hover:to-pink-600 text-white py-3 rounded-xl font-bold transition-all duration-300 cursor-pointer text-center text-sm border border-slate-700 hover:border-transparent hover:shadow-lg hover:shadow-purple-500/20 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Pay Now
+                  {paymentLoading ? "Processing..." : "Pay Now"}
                 </button>
               </div>
 
@@ -369,12 +472,51 @@ export default function Home() {
             <div className="mt-8 pt-4 border-t border-slate-800 flex items-center justify-center gap-3">
               <button 
                 onClick={handleCloseModal}
-                className="px-6 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl font-semibold transition-all duration-150 cursor-pointer text-sm border border-slate-750"
+                className="px-6 py-2.5 bg-slate-800 hover:bg-slate-750 text-slate-300 rounded-xl font-semibold transition-all duration-150 cursor-pointer text-sm border border-slate-750"
               >
                 Close & Stay on Search Page
               </button>
             </div>
 
+          </div>
+        </div>
+      )}
+
+      {/* Premium Payment Success Modal */}
+      {showSuccessModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-in fade-in duration-300">
+          <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-md"></div>
+          
+          <div className="relative bg-slate-900 text-white backdrop-blur-2xl border border-slate-800 shadow-2xl rounded-[40px] p-8 max-w-lg w-full text-center animate-in zoom-in-95 duration-200 z-10 overflow-hidden group">
+            {/* Dynamic Background Shine */}
+            <div className="animate-shine"></div>
+            
+            {/* Success Icon with Pulsing Ring */}
+            <div className="relative w-20 h-20 bg-green-500/10 text-green-500 rounded-full flex items-center justify-center mx-auto mb-6 border border-green-500/20 shadow-inner">
+              <div className="absolute inset-0 rounded-full bg-green-500/20 animate-ping"></div>
+              <svg className="w-10 h-10 transform group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+
+            <h3 className="text-3xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-emerald-400">
+              Payment Successful! 🎉
+            </h3>
+
+            <p className="text-slate-300 mt-4 font-medium leading-relaxed">
+              Thank you for subscribing! Your account has been upgraded to the <span className="text-green-400 font-bold capitalize">{successPlanName}</span> plan. Your search quota limits have been fully unlocked.
+            </p>
+
+            <button 
+              onClick={() => {
+                setShowSuccessModal(false);
+                // Reload state to reflect updated limits and clear screen blockers
+                window.location.reload();
+              }}
+              className="mt-8 px-8 py-3.5 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-400 hover:to-emerald-400 text-white font-bold rounded-2xl shadow-lg shadow-green-500/20 hover:shadow-green-500/40 active:scale-[0.98] transition-all duration-200 cursor-pointer w-full text-sm"
+            >
+              Start Sourcing Leads
+            </button>
           </div>
         </div>
       )}

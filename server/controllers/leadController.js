@@ -26,7 +26,7 @@ export const getLeads = async (req, res) => {
       });
     }
 
-    if (user.freeUsed) {
+    if (user.freeUsed && !user.subscriptionActive) {
       return res.status(403).json({
         success: false,
         message: "subscription required ",
@@ -45,10 +45,12 @@ export const getLeads = async (req, res) => {
     // Fetch and filter leads using the service
     const filteredLeads = await leadService.getLeadsByKeyword(keyword, limit);
 
-    // Consume the user's free search access quota and set lead limit
-    user.freeUsed = true;
-    user.leadLimit = 25;
-    await user.save();
+    // Consume the user's free search access quota only if not subscribed
+    if (!user.subscriptionActive) {
+      user.freeUsed = true;
+      user.leadLimit = 25;
+      await user.save();
+    }
 
     console.log(`[Controller] Fetched ${filteredLeads.length} leads for: "${keyword}"`);
 

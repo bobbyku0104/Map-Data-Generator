@@ -22,6 +22,14 @@ const userSchema = new mongoose.Schema({
       type: Number,
       default: 0,
    },
+   subscriptionPlan: {
+      type: String,
+      default: "free",
+   },
+   subscriptionActive: {
+      type: Boolean,
+      default: false,
+   },
 }, { timestamps: true });
 
 export default mongoose.model("User", userSchema);
