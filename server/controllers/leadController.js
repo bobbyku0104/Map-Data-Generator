@@ -58,9 +58,12 @@ export const getLeads = async (req, res) => {
   } catch (error) {
     console.error("[Controller Error]:", error.response?.data || error.message);
 
-    res.status(500).json({
+    const statusCode = error.response?.status || 500;
+    const apiMessage = error.response?.data?.message || error.response?.data?.error || error.message || "Failed to fetch leads";
+
+    res.status(statusCode).json({
       success: false,
-      message: "Failed to fetch leads",
+      message: `Failed to fetch leads: ${apiMessage}`,
     });
   }
 };
