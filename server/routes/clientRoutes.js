@@ -11,6 +11,11 @@ router.post("/client-access", protect, async (req, res) => {
         // current logged in user
         const user = await User.findById(req.user.id);
 
+        // Check if subscription is active
+        if (user.subscriptionActive) {
+            return res.status(200).json({ message: "Subscription active", leadLimit: user.leadLimit || 500 });
+        }
+
         // first free access
         if (!user.freeUsed) {
             return res.status(200).json({ message: "Free access available", leadLimit: 25 });
