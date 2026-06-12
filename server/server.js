@@ -15,10 +15,20 @@ connectDB();
 
 const app = express();
 
-// Middlewares
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://map-data-generator.vercel.app"
+];
+
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin) || (process.env.FRONTEND_URL && origin === process.env.FRONTEND_URL)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
   })
 );
