@@ -27,7 +27,13 @@ const protect = async (req, res, next) => {
 
     return next();
   } catch (error) {
-    console.error("Auth Middleware Error:", error);
+    if (error.name === "TokenExpiredError") {
+      console.warn("Auth Middleware: JWT expired");
+    } else if (error.name === "JsonWebTokenError") {
+      console.warn("Auth Middleware: Invalid JWT");
+    } else {
+      console.error("Auth Middleware Error:", error);
+    }
     return res.status(401).json({ message: "Not authorized, token failed" });
   }
 };
