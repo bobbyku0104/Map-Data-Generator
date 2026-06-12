@@ -53,14 +53,9 @@ export default function Navbar() {
           
           <div className="h-6 w-px bg-slate-200 mx-2 hidden md:block"></div>
           
-          <a
-            href="https://github.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="p-2 text-slate-400 hover:text-slate-900 transition-colors"
-          >
+          <div className="p-2 text-slate-400">
             <Code2 className="w-5 h-5" />
-          </a>
+          </div>
 
           {currentUser ? (
             <div className="flex items-center gap-3 animate-in fade-in duration-300">
