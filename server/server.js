@@ -26,9 +26,10 @@ const allowedOrigins = [
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow if no origin (like mobile apps/curl) or matched allowedOrigins/Vercel domains
-      const isAllowedVercel = origin && (origin.endsWith(".vercel.app") || origin.includes(".vercel.app"));
-      if (!origin || allowedOrigins.includes(origin) || isAllowedVercel || (process.env.FRONTEND_URL && origin === process.env.FRONTEND_URL)) {
+      // Allow if no origin (like mobile apps/curl) or matched allowedOrigins/hosting domains
+      const isAllowedHost =
+        origin && (origin.endsWith(".vercel.app") || origin.endsWith(".onrender.com"));
+      if (!origin || allowedOrigins.includes(origin) || isAllowedHost || (process.env.FRONTEND_URL && origin === process.env.FRONTEND_URL)) {
         callback(null, true);
       } else {
         callback(new Error("Not allowed by CORS"));
@@ -55,6 +56,10 @@ app.use("/", leadRoutes);
 const PORT = process.env.PORT || 5000;
 
 // Start Server
-app.listen(PORT, () => {
+app.listen(PORT, (err) => {
+  if (err) {
+    console.error(`Failed to start server on port ${PORT}:`, err.message);
+    process.exit(1);
+  }
   console.log(`Server running on port ${PORT} 🚀`);
 });

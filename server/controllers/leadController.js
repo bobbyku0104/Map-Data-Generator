@@ -58,12 +58,25 @@ export const getLeads = async (req, res) => {
   } catch (error) {
     console.error("[Controller Error]:", error.response?.data || error.message);
 
-    const statusCode = error.response?.status || 500;
-    const apiMessage = error.response?.data?.message || error.response?.data?.error || error.message || "Failed to fetch leads";
+    // Upstream 401/403 means our API key is bad, not the user's session —
+    // report it as 502 so the client doesn't log the user out.
+    const upstreamStatus = error.response?.status;
+    const statusCode = upstreamStatus
+      ? ([401, 403].includes(upstreamStatus) ? 502 : upstreamStatus)
+      : 500;
+    const upstreamError = error.response?.data?.error;
+    const apiMessage =
+      error.response?.data?.message ||
+      (typeof upstreamError === "object" ? upstreamError?.message : upstreamError) ||
+      error.message ||
+      "Failed to fetch leads";
 
-    res.status(statusCode).json({
-      success: false,
-      message: `Failed to fetch leads: ${apiMessage}`,
-    });
+    // The lead API rejects us once the plan quota is used up
+    const message =
+      upstreamStatus === 429
+        ? "Lead API quota exceeded. Please check your OpenWebNinja plan usage."
+        : `Failed to fetch leads: ${apiMessage}`;
+
+    res.status(statusCode).json({ success: false, message });
   }
 };

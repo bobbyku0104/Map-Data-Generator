@@ -17,12 +17,12 @@ export default function Hero({ onSearch, isPremium }) {
   };
 
   return (
-    <div className="relative overflow-hidden bg-linear-to-br from-blue-50 via-white to-purple-50">
+    <div className="relative overflow-hidden bg-linear-to-br from-blue-50 via-white to-blue-50">
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
         <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
       </div>
 
       <div className="relative flex flex-col items-center justify-center text-center px-4 py-16 md:py-24 max-w-6xl mx-auto">
@@ -33,7 +33,7 @@ export default function Hero({ onSearch, isPremium }) {
         </div>
 
         {/* Main Heading */}
-        <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold bg-linear-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-4">
+        <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold bg-linear-to-r from-blue-600 via-blue-500 to-sky-500 bg-clip-text text-transparent mb-4">
           Generate Business
           <br />
           Leads Instantly
@@ -109,7 +109,7 @@ export default function Hero({ onSearch, isPremium }) {
               <button
                 type="submit"
                 disabled={!location || !profession || isLoading}
-                className="relative w-full h-14 bg-linear-to-r from-blue-600 to-purple-600 text-white rounded-2xl font-semibold text-lg transition-all transform hover:scale-[1.02] hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 group"
+                className="relative w-full h-14 bg-linear-to-r from-blue-600 to-sky-500 text-white rounded-2xl font-semibold text-lg transition-all transform hover:scale-[1.02] hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 group"
               >
                 {isLoading ? (
                   <div className="flex items-center justify-center gap-2">

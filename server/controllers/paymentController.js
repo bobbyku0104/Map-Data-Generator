@@ -17,6 +17,36 @@ const getPlanDetails = (plan) => {
   }
 };
 
+// Mock checkout lets the app be tested without Razorpay keys.
+// It activates a plan without any payment, so it stays off in production.
+const mockPaymentsEnabled = () =>
+  process.env.NODE_ENV !== "production" &&
+  process.env.ALLOW_MOCK_PAYMENTS === "true";
+
+// Activate a plan for the user and return the fields the client stores
+const activatePlan = async (userId, plan, limit) => {
+  const user = await User.findByIdAndUpdate(
+    userId,
+    {
+      freeUsed: false,
+      subscriptionPlan: plan.toLowerCase(),
+      subscriptionActive: true,
+      leadLimit: limit,
+    },
+    { new: true }
+  );
+
+  return {
+    id: user._id,
+    name: user.name,
+    email: user.email,
+    subscriptionPlan: user.subscriptionPlan,
+    subscriptionActive: user.subscriptionActive,
+    freeUsed: user.freeUsed,
+    leadLimit: user.leadLimit,
+  };
+};
+
 // @desc    Create a Razorpay order or fallback to mock sandbox order
 // @route   POST /api/payments/checkout
 // @access  Private
@@ -31,7 +61,21 @@ export async function createOrder(req, res) {
     const hasKeys = process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET;
 
     if (!hasKeys) {
-      return res.status(500).json({ message: "Razorpay credentials are not configured on the server." });
+      if (mockPaymentsEnabled()) {
+        const user = await activatePlan(req.user.id, plan, limit);
+        console.log(`[MOCK] Activated ${plan} plan without payment for user: ${req.user.id}`);
+        return res.status(200).json({
+          success: true,
+          mock: true,
+          message: `Mock sandbox: ${plan.toUpperCase()} plan activated without payment.`,
+          plan,
+          user,
+        });
+      }
+
+      // Server misconfiguration, not a crash — tell the client payments are unavailable
+      console.error("Razorpay credentials missing: set RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET in server/.env");
+      return res.status(503).json({ message: "Payments are not available right now. Please try again later." });
     }
 
     const options = {
@@ -75,7 +119,9 @@ export async function verifyPayment(req, res) {
     const hasKeys = process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET;
 
     if (!hasKeys) {
-      return res.status(500).json({ message: "Razorpay credentials are not configured on the server." });
+      // Server misconfiguration, not a crash — tell the client payments are unavailable
+      console.error("Razorpay credentials missing: set RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET in server/.env");
+      return res.status(503).json({ message: "Payments are not available right now. Please try again later." });
     }
 
     // Real Signature Verification Flow
@@ -93,29 +139,12 @@ export async function verifyPayment(req, res) {
 
     // Upgrade database states on valid real signature
     console.log(`Real Razorpay payment verified successfully for User: ${userId}, Plan: ${plan}`);
-    const user = await User.findByIdAndUpdate(
-      userId,
-      {
-        freeUsed: false,
-        subscriptionPlan: plan.toLowerCase(),
-        subscriptionActive: true,
-        leadLimit: limit,
-      },
-      { new: true }
-    );
+    const user = await activatePlan(userId, plan, limit);
 
     res.status(200).json({
       success: true,
       message: `Subscription activated successfully (${plan.toUpperCase()})!`,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        subscriptionPlan: user.subscriptionPlan,
-        subscriptionActive: user.subscriptionActive,
-        freeUsed: user.freeUsed,
-        leadLimit: user.leadLimit,
-      },
+      user,
     });
   } catch (error) {
     console.error("Verify Payment Error:", error);

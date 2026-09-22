@@ -59,7 +59,7 @@ export default function LeadsTable({ leads, location, profession, limit }) {
   return (
     <div className="mt-12 bg-white border border-slate-200 shadow-2xl shadow-slate-200/50 rounded-3xl overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-6 p-6 border-b border-slate-100 bg-slate-50/30">
+      <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-6 p-6 border-b border-slate-100 bg-[#f1f5fb]/30">
         <div>
           <div className="flex items-center gap-2 mb-1">
             <h2 className="font-bold text-2xl text-slate-900 tracking-tight">
@@ -84,7 +84,7 @@ export default function LeadsTable({ leads, location, profession, limit }) {
           </button>
           <button
             onClick={exportToCsv}
-            className="inline-flex items-center gap-2 border-2 border-slate-200 bg-white text-slate-700 px-5 py-2.5 rounded-xl hover:bg-slate-50 hover:border-slate-300 text-sm font-semibold transition-all active:scale-95"
+            className="inline-flex items-center gap-2 border-2 border-slate-200 bg-white text-slate-700 px-5 py-2.5 rounded-xl hover:bg-[#f1f5fb] hover:border-slate-300 text-sm font-semibold transition-all active:scale-95"
           >
             <Download size={18} className="text-slate-400" />
             Export CSV
@@ -96,7 +96,7 @@ export default function LeadsTable({ leads, location, profession, limit }) {
       <div className="overflow-x-auto">
         <table className="w-full text-sm text-left border-collapse">
           <thead>
-            <tr className="bg-slate-50 text-slate-500 border-b border-slate-100">
+            <tr className="bg-[#f1f5fb] text-slate-500 border-b border-slate-100">
               <th className="px-4 py-4 font-bold uppercase tracking-wider text-[11px]">#</th>
               <th className="px-6 py-4 font-bold uppercase tracking-wider text-[11px]">Business Details</th>
               <th className="px-4 py-4 font-bold uppercase tracking-wider text-[11px]">Contact</th>
@@ -151,9 +151,9 @@ export default function LeadsTable({ leads, location, profession, limit }) {
                   {/* Reputation */}
                   <td className="px-4 py-5">
                     <div className="flex flex-col gap-2">
-                      <div className="inline-flex items-center gap-1.5 rounded-lg bg-amber-50 px-2 py-1 w-fit border border-amber-100">
+                      <div className="inline-flex items-center gap-1.5 rounded-lg bg-blue-50 px-2 py-1 w-fit border border-blue-100">
                         <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                        <span className="text-xs font-bold text-amber-700">
+                        <span className="text-xs font-bold text-blue-700">
                           {typeof lead.rating === 'number' ? lead.rating.toFixed(1) : lead.rating}
                         </span>
                       </div>
@@ -178,7 +178,7 @@ export default function LeadsTable({ leads, location, profession, limit }) {
                           <Map size={18} />
                         </a>
                       ) : (
-                        <div className="p-2 bg-slate-50 text-slate-300 rounded-lg cursor-not-allowed">
+                        <div className="p-2 bg-[#f1f5fb] text-slate-300 rounded-lg cursor-not-allowed">
                           <Map size={18} />
                         </div>
                       )}
@@ -193,7 +193,7 @@ export default function LeadsTable({ leads, location, profession, limit }) {
                           <Globe size={18} />
                         </a>
                       ) : (
-                        <div className="p-2 bg-slate-50 text-slate-300 rounded-lg cursor-not-allowed">
+                        <div className="p-2 bg-[#f1f5fb] text-slate-300 rounded-lg cursor-not-allowed">
                           <Globe size={18} />
                         </div>
                       )}
@@ -205,7 +205,7 @@ export default function LeadsTable({ leads, location, profession, limit }) {
               <tr>
                 <td colSpan="6" className="text-center py-20 text-slate-400">
                   <div className="flex flex-col items-center gap-3">
-                    <div className="bg-slate-50 p-4 rounded-full">
+                    <div className="bg-[#f1f5fb] p-4 rounded-full">
                       <Globe className="w-8 h-8 text-slate-200" />
                     </div>
                     <p className="font-medium">No results to display</p>

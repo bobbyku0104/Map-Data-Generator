@@ -59,11 +59,11 @@ export default function Signup() {
   };
 
   return (
-    <div className="min-h-screen relative flex items-center justify-center bg-slate-50 overflow-hidden px-4 py-12">
+    <div className="min-h-screen relative flex items-center justify-center bg-gradient-to-b from-[#ccdcf0] via-[#eef4fb] to-white overflow-hidden px-4 py-12">
       {/* Dynamic Background Glow Blobs */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-[-10%] right-[-10%] w-[50vw] h-[50vw] max-w-[600px] max-h-[600px] bg-blue-400/20 rounded-full filter blur-[120px] animate-pulse"></div>
-        <div className="absolute bottom-[-10%] left-[-10%] w-[50vw] h-[50vw] max-w-[600px] max-h-[600px] bg-purple-400/20 rounded-full filter blur-[120px] animate-pulse duration-[6000ms]"></div>
+        <div className="absolute bottom-[-10%] left-[-10%] w-[50vw] h-[50vw] max-w-[600px] max-h-[600px] bg-blue-400/20 rounded-full filter blur-[120px] animate-pulse duration-[6000ms]"></div>
       </div>
 
       {/* Main Glassmorphic Container */}
@@ -71,11 +71,11 @@ export default function Signup() {
         
         {/* Brand Emblem & Headings */}
         <div className="text-center mb-8">
-          <div className="w-14 h-14 bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center rounded-2xl mx-auto text-2xl font-black shadow-lg shadow-blue-500/30 transform hover:rotate-12 transition-transform duration-300">
+          <div className="w-14 h-14 bg-gradient-to-tr from-blue-600 to-sky-500 text-white flex items-center justify-center rounded-2xl mx-auto text-2xl font-black shadow-lg shadow-blue-500/30 transform hover:rotate-12 transition-transform duration-300">
             <Sparkles className="w-7 h-7" />
           </div>
 
-          <h2 className="text-3xl font-extrabold mt-4 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent tracking-tight">
+          <h2 className="text-3xl font-extrabold mt-4 bg-gradient-to-r from-blue-600 via-blue-500 to-sky-500 bg-clip-text text-transparent tracking-tight">
             Create Account
           </h2>
 
@@ -102,7 +102,7 @@ export default function Signup() {
               Full Name
             </label>
 
-            <div className="flex items-center border border-slate-200 rounded-2xl mt-2 px-4 bg-slate-50/50 focus-within:bg-white focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-100 transition-all duration-300 shadow-inner">
+            <div className="flex items-center border border-slate-200 rounded-2xl mt-2 px-4 bg-[#f1f5fb]/50 focus-within:bg-white focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-100 transition-all duration-300 shadow-inner">
               <User size={18} className="text-slate-400 mr-2 flex-shrink-0" />
 
               <input
@@ -122,7 +122,7 @@ export default function Signup() {
               Email Address
             </label>
 
-            <div className="flex items-center border border-slate-200 rounded-2xl mt-2 px-4 bg-slate-50/50 focus-within:bg-white focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-100 transition-all duration-300 shadow-inner">
+            <div className="flex items-center border border-slate-200 rounded-2xl mt-2 px-4 bg-[#f1f5fb]/50 focus-within:bg-white focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-100 transition-all duration-300 shadow-inner">
               <Mail size={18} className="text-slate-400 mr-2 flex-shrink-0" />
 
               <input
@@ -142,7 +142,7 @@ export default function Signup() {
               Password
             </label>
 
-            <div className="flex items-center border border-slate-200 rounded-2xl mt-2 px-4 bg-slate-50/50 focus-within:bg-white focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-100 transition-all duration-300 shadow-inner">
+            <div className="flex items-center border border-slate-200 rounded-2xl mt-2 px-4 bg-[#f1f5fb]/50 focus-within:bg-white focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-100 transition-all duration-300 shadow-inner">
               <Lock size={18} className="text-slate-400 mr-2 flex-shrink-0" />
 
               <input
@@ -162,7 +162,7 @@ export default function Signup() {
               Confirm Password
             </label>
 
-            <div className="flex items-center border border-slate-200 rounded-2xl mt-2 px-4 bg-slate-50/50 focus-within:bg-white focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-100 transition-all duration-300 shadow-inner">
+            <div className="flex items-center border border-slate-200 rounded-2xl mt-2 px-4 bg-[#f1f5fb]/50 focus-within:bg-white focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-100 transition-all duration-300 shadow-inner">
               <Lock size={18} className="text-slate-400 mr-2 flex-shrink-0" />
 
               <input
@@ -180,7 +180,7 @@ export default function Signup() {
           <button
             type="submit"
             disabled={loading}
-            className="relative w-full bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:to-indigo-500 text-white py-3.5 rounded-2xl font-bold transition-all duration-300 shadow-xl shadow-blue-500/20 hover:shadow-indigo-500/30 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed group overflow-hidden cursor-pointer mt-2"
+            className="relative w-full bg-gradient-to-r from-blue-600 via-blue-500 to-sky-500 hover:from-blue-400 hover:to-blue-500 text-white py-3.5 rounded-2xl font-bold transition-all duration-300 shadow-xl shadow-blue-500/20 hover:shadow-sky-500/30 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed group overflow-hidden cursor-pointer mt-2"
           >
             {/* Sweeping Shine Overlay */}
             <div className="animate-shine"></div>
@@ -201,7 +201,7 @@ export default function Signup() {
           Already have an account?{" "}
           <span
             onClick={() => !loading && navigate("/")}
-            className="text-blue-600 font-bold cursor-pointer hover:text-indigo-700 transition-colors inline-flex items-center gap-0.5 group"
+            className="text-blue-600 font-bold cursor-pointer hover:text-sky-700 transition-colors inline-flex items-center gap-0.5 group"
           >
             <span>Login</span>
             <span className="transform group-hover:translate-x-0.5 transition-transform duration-200">&rarr;</span>

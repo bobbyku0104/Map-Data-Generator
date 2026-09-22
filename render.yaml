@@ -1,0 +1,47 @@
+services:
+  # ─── Backend (Node / Express) ───────────────────────────────────────────────
+  - type: web
+    name: map-data-generator-api
+    runtime: node
+    rootDir: server
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /
+    envVars:
+      - key: NODE_ENV
+        value: production
+      # Mock checkout must never run on a live site
+      - key: ALLOW_MOCK_PAYMENTS
+        value: "false"
+      # Set these in the Render dashboard (Environment tab) — never commit them
+      - key: MONGO_URL
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: RAZORPAY_KEY_ID
+        sync: false
+      - key: RAZORPAY_KEY_SECRET
+        sync: false
+      - key: OPENWEBNINJA_API_KEY
+        sync: false
+      # The frontend URL, e.g. https://map-data-generator-web.onrender.com
+      - key: FRONTEND_URL
+        sync: false
+
+  # ─── Frontend (React / Vite static site) ───────────────────────────────────
+  - type: web
+    name: map-data-generator-web
+    runtime: static
+    rootDir: client
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./dist
+    envVars:
+      # The backend URL, e.g. https://map-data-generator-api.onrender.com
+      - key: VITE_API_URL
+        sync: false
+    routes:
+      # React Router needs every path served by index.html
+      - type: rewrite
+        source: /*
+        destination: /index.html

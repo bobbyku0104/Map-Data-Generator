@@ -60,7 +60,7 @@ export default function Navbar() {
           {currentUser ? (
             <div className="flex items-center gap-3 animate-in fade-in duration-300">
               {/* User Avatar */}
-              <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-full shadow-inner">
+              <div className="flex items-center gap-2 bg-[#f1f5fb] border border-slate-200 px-3 py-1.5 rounded-full shadow-inner">
                 <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold shadow-md">
                   {getInitials(currentUser.name)}
                 </div>

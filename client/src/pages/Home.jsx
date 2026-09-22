@@ -17,7 +17,8 @@ export default function Home() {
   const [checkingAccess, setCheckingAccess] = useState(true);
 
   // Subscription Checkout states
-  const [paymentLoading, setPaymentLoading] = useState(false);
+  const [paymentLoading, setPaymentLoading] = useState(null); // plan currently being paid for
+  const [paymentError, setPaymentError] = useState("");
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [successPlanName, setSuccessPlanName] = useState("");
 
@@ -37,7 +38,8 @@ export default function Home() {
 
   const handlePaymentCheckout = async (plan) => {
     try {
-      setPaymentLoading(true);
+      setPaymentLoading(plan);
+      setPaymentError("");
       const token = localStorage.getItem("token");
       const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:5000";
       const userObj = JSON.parse(localStorage.getItem("user") || "{}");
@@ -53,10 +55,19 @@ export default function Home() {
         }
       );
 
+      // Mock sandbox: the server activated the plan without a real payment
+      if (res.data.mock) {
+        localStorage.setItem("user", JSON.stringify(res.data.user));
+        setSuccessPlanName(plan);
+        setShowDeniedModal(false);
+        setShowSuccessModal(true);
+        return;
+      }
+
       // Real Razorpay Process
       const scriptLoaded = await loadRazorpayScript();
       if (!scriptLoaded) {
-        alert("Failed to load Razorpay SDK. Please verify your connection.");
+        setPaymentError("Failed to load Razorpay SDK. Please check your connection and try again.");
         return;
       }
 
@@ -92,7 +103,7 @@ export default function Home() {
             }
           } catch (err) {
             console.error("Signature verification error:", err);
-            alert(err.response?.data?.message || "Verification failed. Please contact support.");
+            setPaymentError(err.response?.data?.message || "Verification failed. Please contact support.");
           }
         },
         prefill: {
@@ -109,9 +120,9 @@ export default function Home() {
       rzp.open();
     } catch (err) {
       console.error("Checkout failed:", err);
-      alert(err.response?.data?.message || "Failed to initialize checkout. Try again.");
+      setPaymentError(err.response?.data?.message || "Failed to initialize checkout. Please try again.");
     } finally {
-      setPaymentLoading(false);
+      setPaymentLoading(null);
     }
   };
 
@@ -228,7 +239,7 @@ export default function Home() {
 
 
   return (
-    <div className="min-h-screen bg-slate-50/50 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-b from-[#ccdcf0] via-[#eef4fb] to-white flex flex-col">
       <Navbar />
       
       <main className="flex-grow">
@@ -269,7 +280,7 @@ export default function Home() {
 
           {!loading && !error && leads.length === 0 && location && (
             <div className="mt-12 text-center py-24 bg-white rounded-[40px] border border-slate-100 shadow-xl shadow-slate-200/50 animate-in fade-in duration-500">
-              <div className="bg-slate-50 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 border-4 border-white shadow-inner">
+              <div className="bg-[#f1f5fb] w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 border-4 border-white shadow-inner">
                 <Search className="w-10 h-10 text-slate-300" />
               </div>
               <h3 className="text-2xl font-bold text-slate-900">No leads found</h3>
@@ -327,6 +338,13 @@ export default function Home() {
               <p className="text-slate-400 mt-2 font-medium leading-relaxed">
                 You have already used your first free lead search access. Sourcing more high-value leads requires a subscription. Please upgrade to continue.
               </p>
+
+              {paymentError && (
+                <div className="mt-5 flex items-start gap-3 bg-red-500/10 border border-red-500/20 text-red-300 rounded-2xl px-4 py-3 text-left text-sm font-medium">
+                  <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
+                  <span>{paymentError}</span>
+                </div>
+              )}
             </div>
 
 
@@ -368,15 +386,15 @@ export default function Home() {
 
                 <button 
                   onClick={() => handlePaymentCheckout("starter")}
-                  disabled={paymentLoading}
-                  className="w-full bg-slate-800 hover:bg-gradient-to-r hover:from-blue-600 hover:to-indigo-600 text-white py-3 rounded-xl font-bold transition-all duration-300 cursor-pointer text-center text-sm border border-slate-700 hover:border-transparent hover:shadow-lg hover:shadow-blue-500/20 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={paymentLoading !== null}
+                  className="w-full bg-slate-800 hover:bg-gradient-to-r hover:from-blue-600 hover:to-sky-600 text-white py-3 rounded-xl font-bold transition-all duration-300 cursor-pointer text-center text-sm border border-slate-700 hover:border-transparent hover:shadow-lg hover:shadow-blue-500/20 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {paymentLoading ? "Processing..." : "Pay Now"}
+                  {paymentLoading === "starter" ? "Processing..." : "Pay Now"}
                 </button>
               </div>
 
               {/* Plan 2: Pro (Unique Glowing Card) */}
-              <div className="flex flex-col bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 border-none rounded-3xl p-6 transition-all duration-500 hover:shadow-2xl hover:shadow-blue-400/40 hover:-translate-y-3 hover:scale-[1.04] text-left relative scale-100 lg:scale-[1.02] shadow-xl overflow-hidden group">
+              <div className="flex flex-col bg-gradient-to-br from-blue-600 via-blue-500 to-sky-500 border-none rounded-3xl p-6 transition-all duration-500 hover:shadow-2xl hover:shadow-blue-400/40 hover:-translate-y-3 hover:scale-[1.04] text-left relative scale-100 lg:scale-[1.02] shadow-xl overflow-hidden group">
                 {/* Shine Sweep Effect on Hover */}
                 <div className="animate-shine"></div>
                 
@@ -417,15 +435,15 @@ export default function Home() {
 
                 <button 
                   onClick={() => handlePaymentCheckout("pro")}
-                  disabled={paymentLoading}
-                  className="w-full bg-white hover:bg-gradient-to-r hover:from-yellow-400 hover:to-orange-500 hover:text-white text-blue-700 py-3 rounded-xl font-bold transition-all duration-300 cursor-pointer text-center text-sm shadow-md hover:shadow-lg hover:shadow-yellow-500/20 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={paymentLoading !== null}
+                  className="w-full bg-white hover:bg-blue-50 text-blue-700 py-3 rounded-xl font-bold transition-all duration-300 cursor-pointer text-center text-sm shadow-md hover:shadow-lg hover:shadow-blue-500/30 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                 {paymentLoading ? "Processing..." : "Pay Now"}
+                 {paymentLoading === "pro" ? "Processing..." : "Pay Now"}
                 </button>
               </div>
 
               {/* Plan 3: Enterprise */}
-              <div className="flex flex-col bg-slate-950 border border-slate-800 rounded-3xl p-6 transition-all duration-500 hover:border-purple-500/50 hover:shadow-2xl hover:shadow-purple-500/10 hover:-translate-y-2 hover:scale-[1.03] text-left relative text-white overflow-hidden group">
+              <div className="flex flex-col bg-slate-950 border border-slate-800 rounded-3xl p-6 transition-all duration-500 hover:border-blue-500/50 hover:shadow-2xl hover:shadow-blue-500/10 hover:-translate-y-2 hover:scale-[1.03] text-left relative text-white overflow-hidden group">
                 {/* Shine Sweep Effect on Hover */}
                 <div className="animate-shine"></div>
                 
@@ -459,10 +477,10 @@ export default function Home() {
 
                 <button 
                   onClick={() => handlePaymentCheckout("enterprise")}
-                  disabled={paymentLoading}
-                  className="w-full bg-slate-800 hover:bg-gradient-to-r hover:from-purple-600 hover:to-pink-600 text-white py-3 rounded-xl font-bold transition-all duration-300 cursor-pointer text-center text-sm border border-slate-700 hover:border-transparent hover:shadow-lg hover:shadow-purple-500/20 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={paymentLoading !== null}
+                  className="w-full bg-slate-800 hover:bg-gradient-to-r hover:from-blue-600 hover:to-blue-600 text-white py-3 rounded-xl font-bold transition-all duration-300 cursor-pointer text-center text-sm border border-slate-700 hover:border-transparent hover:shadow-lg hover:shadow-blue-500/20 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {paymentLoading ? "Processing..." : "Pay Now"}
+                  {paymentLoading === "enterprise" ? "Processing..." : "Pay Now"}
                 </button>
               </div>
 
